@@ -18,6 +18,7 @@ import com.hncboy.chatgpt.front.domain.request.ChatProcessRequest;
 import com.hncboy.chatgpt.front.service.ChatMessageService;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.entity.chat.Message;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -31,6 +32,7 @@ import java.util.Objects;
  * ApiKey 响应处理
  */
 @Component
+@Slf4j
 public class ApiKeyResponseEmitter implements ResponseEmitter {
 
     @Resource
@@ -65,6 +67,8 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                     .build();
             messages.addFirst(systemMessage);
         }
+        log.info("messages={}", ObjectMapperUtil.toJson(messages));
+        System.out.println("messages={}" + ObjectMapperUtil.toJson(messages));
 
         // 构建聊天参数
         ChatCompletion chatCompletion = ChatCompletion.builder()
@@ -102,6 +106,10 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
      */
     private void addContextChatMessage(ChatMessageDO chatMessageDO, LinkedList<Message> messages) {
         if (Objects.isNull(chatMessageDO)) {
+            return;
+        }
+        // 最多[5]条消息
+        if(messages.size() == 5) {
             return;
         }
         // 父级消息id为空，表示是第一条消息，直接添加到message里
