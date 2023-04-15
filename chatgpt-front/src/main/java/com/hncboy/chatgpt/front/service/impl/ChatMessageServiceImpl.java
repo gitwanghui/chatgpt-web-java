@@ -117,6 +117,7 @@ public class ChatMessageServiceImpl extends ServiceImpl<ChatMessageMapper, ChatM
             // TODO 判断 tokens 数量是否超过 4096
             // ApiKey 限制上下文问题的数量
             if (chatMessageDO.getApiType() == ApiTypeEnum.API_KEY
+                    && chatConfig.getLimitQuestionContextCount() > 0
                     && chatMessageDO.getQuestionContextCount() > chatConfig.getLimitQuestionContextCount()) {
                 throw new ServiceException(StrUtil.format("当前允许连续对话的问题数量为[{}]次，已达到上限，请关闭上下文对话重新发送", chatConfig.getLimitQuestionContextCount()));
             }

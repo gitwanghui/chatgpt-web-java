@@ -114,6 +114,11 @@ public class ChatConfig implements InitializingBean {
     private Boolean isAdminShowHiddenMessage;
 
     /**
+     * 最大最近上下文个数
+     */
+    private Integer maxRecentContextCount;
+
+    /**
      * 判断是否有 http 代理
      *
      * @return true/false

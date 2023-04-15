@@ -68,7 +68,6 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
             messages.addFirst(systemMessage);
         }
         log.info("messages={}", ObjectMapperUtil.toJson(messages));
-        System.out.println("messages={}" + ObjectMapperUtil.toJson(messages));
 
         // 构建聊天参数
         ChatCompletion chatCompletion = ChatCompletion.builder()
@@ -108,8 +107,8 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
         if (Objects.isNull(chatMessageDO)) {
             return;
         }
-        // 最多[5]条消息
-        if(messages.size() == 5) {
+        // 最多N条消息
+        if(messages.size() >= chatConfig.getMaxRecentContextCount()) {
             return;
         }
         // 父级消息id为空，表示是第一条消息，直接添加到message里
