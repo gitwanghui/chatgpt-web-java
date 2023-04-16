@@ -48,7 +48,7 @@ public class UserProfileDO {
     /**
      * 聊天室ID
      */
-    private String chatRoomId;
+    private String chatInfo;
 
     /**
      * 创建时间

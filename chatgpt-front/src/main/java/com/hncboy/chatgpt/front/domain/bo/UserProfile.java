@@ -32,5 +32,5 @@ public class UserProfile {
     private String petAvatar;
 
     @Schema(title = "聊天室")
-    private String chatRoomId;
+    private String chatInfo;
 }

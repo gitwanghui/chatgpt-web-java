@@ -31,7 +31,7 @@ public class UserServiceImpl extends ServiceImpl<UserProfileMapper, UserProfileD
                     .set(UserProfileDO::getPetName, fieldValue(userProfile.getPetName(), userProfileDO.getPetName()))
                     .set(UserProfileDO::getPetType, fieldValue(userProfile.getPetType(), userProfileDO.getPetType()))
                     .set(UserProfileDO::getPetAvatar, fieldValue(userProfile.getPetAvatar(), userProfileDO.getPetAvatar()))
-                    .set(UserProfileDO::getChatRoomId, fieldValue(userProfile.getChatRoomId(), userProfileDO.getChatRoomId()))
+                    .set(UserProfileDO::getChatInfo, fieldValue(userProfile.getChatInfo(), userProfileDO.getChatInfo()))
                     .eq(UserProfileDO::getUserId, userProfile.getUserId()));
         }
     }
