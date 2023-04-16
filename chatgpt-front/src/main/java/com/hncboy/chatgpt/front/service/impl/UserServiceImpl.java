@@ -24,6 +24,9 @@ public class UserServiceImpl extends ServiceImpl<UserProfileMapper, UserProfileD
         if(userProfileDO == null) {
             userProfileDO = new UserProfileDO();
             BeanUtils.copyProperties(userProfile, userProfileDO);
+            if(userProfileDO.getChatInfo() == null) {
+                userProfileDO.setChatInfo("{}");
+            }
             return save(userProfileDO);
         } else {
             return update(new LambdaUpdateWrapper<UserProfileDO>()
