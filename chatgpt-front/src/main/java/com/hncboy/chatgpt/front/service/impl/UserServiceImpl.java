@@ -41,7 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserProfileMapper, UserProfileD
         UserProfileDO userProfileDO = this.getOne(new LambdaQueryWrapper<UserProfileDO>()
                 .eq(UserProfileDO::getUserId, userQueryRequest.getUserId()));
         UserProfile userProfile = new UserProfile();
-        BeanUtils.copyProperties(userProfileDO, userProfile);
+        if (userProfileDO != null) {
+            BeanUtils.copyProperties(userProfileDO, userProfile);
+        }
         return userProfile;
     }
 
