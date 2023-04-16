@@ -41,11 +41,6 @@ public class UserProfileDO {
     private String petAvatar;
 
     /**
-     * 用户设定
-     */
-    private String userProfile;
-
-    /**
      * 聊天室ID
      */
     private String chatInfo;
