@@ -49,3 +49,5 @@ chat:
   isShowBalance: ${CHAT_IS_SHOW_BALANCE:false}
   # 是否展示管理端隐藏的消息，默认不展示
   isAdminShowHiddenMessage: ${CHAT_IS_ADMIN_SHOW_HIDDEN_MESSAGE:false}
+  # 最多上下文消息数
+  maxRecentContextCount: ${MAX_RECENT_CONTEXT_COUNT:11}
