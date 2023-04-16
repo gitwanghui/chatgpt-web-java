@@ -25,6 +25,9 @@ public class ChatProcessRequest {
     @Schema(title = "系统消息")
     private String systemMessage;
 
+    @Schema(title = "用户ID")
+    private String userId;
+
     @Data
     @Schema(title = "消息配置")
     public static class Options {
