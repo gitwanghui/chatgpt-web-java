@@ -82,6 +82,7 @@ public class ParsedEventSourceListener extends EventSourceListener {
         this.originalRequestData = builder.originalRequestData;
         this.questionChatMessageDO = builder.chatMessageDO;
         this.answerChatMessageDO = new ChatMessageDO();
+        this.userId = builder.userId;;
     }
 
     @Override
