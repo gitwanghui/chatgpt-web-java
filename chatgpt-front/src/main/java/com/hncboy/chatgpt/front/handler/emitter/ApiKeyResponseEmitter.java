@@ -14,8 +14,11 @@ import com.hncboy.chatgpt.front.api.listener.ParsedEventSourceListener;
 import com.hncboy.chatgpt.front.api.listener.ResponseBodyEmitterStreamListener;
 import com.hncboy.chatgpt.front.api.parser.ChatCompletionResponseParser;
 import com.hncboy.chatgpt.front.api.storage.ApiKeyDatabaseDataStorage;
+import com.hncboy.chatgpt.front.domain.bo.UserProfile;
 import com.hncboy.chatgpt.front.domain.request.ChatProcessRequest;
+import com.hncboy.chatgpt.front.domain.request.UserQueryRequest;
 import com.hncboy.chatgpt.front.service.ChatMessageService;
+import com.hncboy.chatgpt.front.service.UserService;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.entity.chat.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,9 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
     @Resource
     private ApiKeyDatabaseDataStorage dataStorage;
 
+    @Resource
+    private UserService userService;
+
     @Override
     public ResponseBodyEmitter requestToResponseEmitter(ChatProcessRequest chatProcessRequest, ResponseBodyEmitter emitter) {
         // 初始化聊天消息
@@ -59,14 +65,28 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
         addContextChatMessage(chatMessageDO, messages);
 
         // 系统角色消息
-        if (StrUtil.isNotBlank(chatProcessRequest.getSystemMessage())) {
-            // 系统消息
-            Message systemMessage = Message.builder()
-                    .role(Message.Role.SYSTEM)
-                    .content(chatProcessRequest.getSystemMessage())
-                    .build();
-            messages.addFirst(systemMessage);
+        String systemMessageStr = null;
+        if(StrUtil.isNotBlank(chatProcessRequest.getUserId())) {
+            UserQueryRequest userQueryRequest = new UserQueryRequest();
+            userQueryRequest.setUserId(chatProcessRequest.getUserId());
+            UserProfile userProfile = userService.query(userQueryRequest);
+            if(userProfile != null) {
+                systemMessageStr = String.format("你是ChatGPT大语言模型，你正在在和%s聊天，你是一只%s，你的名字是%s，你要认真听从%s的指令。"
+                        , userProfile.getUserName()
+                        , userProfile.getPetType()
+                        , userProfile.getPetName()
+                        , userProfile.getUserName());
+            }
         }
+        if (systemMessageStr == null && StrUtil.isNotBlank(chatProcessRequest.getSystemMessage())) {
+            systemMessageStr = chatProcessRequest.getSystemMessage();
+        }
+        // 系统消息
+        Message systemMessage = Message.builder()
+                .role(Message.Role.SYSTEM)
+                .content(systemMessageStr)
+                .build();
+        messages.addFirst(systemMessage);
         log.info("messages={}", ObjectMapperUtil.toJson(messages));
 
         // 构建聊天参数

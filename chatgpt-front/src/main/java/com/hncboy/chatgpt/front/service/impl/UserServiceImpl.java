@@ -51,6 +51,6 @@ public class UserServiceImpl extends ServiceImpl<UserProfileMapper, UserProfileD
     }
 
     private String fieldValue(String newData, String oldData) {
-        return StringUtils.isBlank(newData) ? newData : oldData;
+        return StringUtils.isNotBlank(newData) ? newData : oldData;
     }
 }
