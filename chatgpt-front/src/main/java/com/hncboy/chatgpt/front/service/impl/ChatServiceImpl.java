@@ -1,12 +1,18 @@
 package com.hncboy.chatgpt.front.service.impl;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.hncboy.chatgpt.base.util.ObjectMapperUtil;
+import com.hncboy.chatgpt.front.domain.bo.UserProfile;
 import com.hncboy.chatgpt.front.domain.request.ChatProcessRequest;
+import com.hncboy.chatgpt.front.domain.request.UserQueryRequest;
 import com.hncboy.chatgpt.front.handler.emitter.ChatMessageEmitterChain;
 import com.hncboy.chatgpt.front.handler.emitter.IpRateLimiterEmitterChain;
 import com.hncboy.chatgpt.front.handler.emitter.ResponseEmitterChain;
 import com.hncboy.chatgpt.front.handler.emitter.SensitiveWordEmitterChain;
 import com.hncboy.chatgpt.front.service.ChatService;
+import com.hncboy.chatgpt.front.service.UserService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
@@ -20,12 +26,36 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 @Service
 public class ChatServiceImpl implements ChatService {
 
+    @Resource
+    private UserService userService;
+
     @Override
     public ResponseBodyEmitter chatProcess(ChatProcessRequest chatProcessRequest) {
         // 超时时间设置 3 分钟
         ResponseBodyEmitter emitter = new ResponseBodyEmitter(3 * 60 * 1000L);
         emitter.onCompletion(() -> log.debug("请求参数：{}，Front-end closed the emitter connection.", ObjectMapperUtil.toJson(chatProcessRequest)));
         emitter.onTimeout(() -> log.error("请求参数：{}，Back-end closed the emitter connection.", ObjectMapperUtil.toJson(chatProcessRequest)));
+
+        if(chatProcessRequest.getUserId() != null
+                && !(chatProcessRequest.getOptions() != null
+                    && chatProcessRequest.getOptions().getConversationId() != null
+                    && chatProcessRequest.getOptions().getParentMessageId() != null)) {
+            try {
+                UserQueryRequest userQueryRequest = new UserQueryRequest();
+                userQueryRequest.setUserId(chatProcessRequest.getUserId());
+                UserProfile userProfile = userService.query(userQueryRequest);
+                if(userProfile != null && userProfile.getChatInfo() != null) {
+                    JSONObject jsonObject = JSONUtil.parseObj(userProfile.getChatInfo());
+                    ChatProcessRequest.Options options = new ChatProcessRequest.Options();
+                    options.setConversationId(jsonObject.getStr("lastAnswerConversationId"));
+                    options.setParentMessageId(jsonObject.getStr("lastAnswerMessageId"));
+                    chatProcessRequest.setOptions(options);
+                }
+                log.info("fulfill options, chatProcessRequest={}", JSONUtil.toJsonStr(chatProcessRequest));
+            } catch (Exception e) {
+                log.error("", e);
+            }
+        }
 
         // 构建 emitter 处理链路
         ResponseEmitterChain ipRateLimiterEmitterChain = new IpRateLimiterEmitterChain();

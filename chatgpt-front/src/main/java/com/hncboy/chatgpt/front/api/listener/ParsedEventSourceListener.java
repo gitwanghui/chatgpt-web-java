@@ -70,6 +70,11 @@ public class ParsedEventSourceListener extends EventSourceListener {
      */
     private String lastOriginalResponseData;
 
+    /**
+     *
+     */
+    private String userId;
+
     private ParsedEventSourceListener(Builder builder) {
         this.listeners = builder.listeners;
         this.parser = builder.parser;
@@ -101,6 +106,7 @@ public class ParsedEventSourceListener extends EventSourceListener {
                     .originalRequestData(originalRequestData)
                     .originalResponseData(lastOriginalResponseData)
                     .parser(parser)
+                    .userId(userId)
                     .build());
         } else {
             // 解析消息
@@ -190,6 +196,8 @@ public class ParsedEventSourceListener extends EventSourceListener {
         private DataStorage dataStorage;
         private ChatMessageDO chatMessageDO;
 
+        private String userId;
+
         public Builder addListener(AbstractStreamListener listener) {
             listeners.add(listener);
             return this;
@@ -212,6 +220,11 @@ public class ParsedEventSourceListener extends EventSourceListener {
 
         public Builder setChatMessageDO(ChatMessageDO chatMessageDO) {
             this.chatMessageDO = chatMessageDO;
+            return this;
+        }
+
+        public Builder setUserId(String userId) {
+            this.userId = userId;
             return this;
         }
 

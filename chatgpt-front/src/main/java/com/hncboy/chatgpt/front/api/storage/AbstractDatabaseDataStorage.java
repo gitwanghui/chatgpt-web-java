@@ -1,13 +1,19 @@
 package com.hncboy.chatgpt.front.api.storage;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.hncboy.chatgpt.base.domain.entity.ChatMessageDO;
 import com.hncboy.chatgpt.base.domain.entity.ChatRoomDO;
 import com.hncboy.chatgpt.base.enums.ChatMessageStatusEnum;
 import com.hncboy.chatgpt.base.enums.ChatMessageTypeEnum;
+import com.hncboy.chatgpt.front.domain.bo.UserProfile;
+import com.hncboy.chatgpt.front.domain.request.UserQueryRequest;
 import com.hncboy.chatgpt.front.service.ChatMessageService;
 import com.hncboy.chatgpt.front.service.ChatRoomService;
+import com.hncboy.chatgpt.front.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 
@@ -16,6 +22,7 @@ import java.util.Date;
  * @date 2023/3/25 17:11
  * 数据库数据存储抽象类
  */
+@Slf4j
 public abstract class AbstractDatabaseDataStorage implements DataStorage {
 
     @Resource
@@ -23,6 +30,9 @@ public abstract class AbstractDatabaseDataStorage implements DataStorage {
 
     @Resource
     protected ChatRoomService chatRoomService;
+
+    @Resource
+    protected UserService userService;
 
     @Override
     public void onMessage(ChatMessageStorage chatMessageStorage) {
@@ -107,6 +117,20 @@ public abstract class AbstractDatabaseDataStorage implements DataStorage {
         // 更新消息
         chatMessageService.updateById(questionChatMessageDO);
         chatMessageService.updateById(answerChatMessageDO);
+        if(chatMessageStorage.getUserId() != null) {
+            try {
+                UserQueryRequest userQueryRequest = new UserQueryRequest();
+                userQueryRequest.setUserId(chatMessageStorage.getUserId());
+                UserProfile userProfile = userService.query(userQueryRequest);
+                JSONObject jsonObject = JSONUtil.parseObj(userProfile.getChatInfo());
+                jsonObject.set("lastAnswerMessageId", answerChatMessageDO.getMessageId());
+                jsonObject.set("lastAnswerConversationId", answerChatMessageDO.getConversationId());
+                userProfile.setChatInfo(jsonObject.toString());
+                userService.createOrUpdate(userProfile);
+            } catch (Exception e) {
+                log.error("", e);
+            }
+        }
     }
 
     @Override

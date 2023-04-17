@@ -48,4 +48,6 @@ public class ChatMessageStorage {
      * 当前消息流条数
      */
     private int currentStreamMessageCount;
+
+    private String userId;
 }

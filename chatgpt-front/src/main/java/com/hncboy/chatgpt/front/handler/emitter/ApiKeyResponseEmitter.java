@@ -111,6 +111,7 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                 .setDataStorage(dataStorage)
                 .setOriginalRequestData(ObjectMapperUtil.toJson(chatCompletion))
                 .setChatMessageDO(chatMessageDO)
+                .setUserId(chatProcessRequest.getUserId())
                 .build();
 
         ApiKeyChatClientBuilder.buildOpenAiStreamClient().streamChatCompletion(chatCompletion, parsedEventSourceListener);
