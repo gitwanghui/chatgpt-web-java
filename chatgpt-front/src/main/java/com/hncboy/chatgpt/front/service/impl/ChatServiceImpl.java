@@ -14,6 +14,7 @@ import com.hncboy.chatgpt.front.service.ChatService;
 import com.hncboy.chatgpt.front.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -38,8 +39,8 @@ public class ChatServiceImpl implements ChatService {
 
         if(chatProcessRequest.getUserId() != null
                 && !(chatProcessRequest.getOptions() != null
-                    && chatProcessRequest.getOptions().getConversationId() != null
-                    && chatProcessRequest.getOptions().getParentMessageId() != null)) {
+                    && StringUtils.isNoneBlank(chatProcessRequest.getOptions().getConversationId())
+                    && StringUtils.isNoneBlank(chatProcessRequest.getOptions().getParentMessageId()))) {
             try {
                 UserQueryRequest userQueryRequest = new UserQueryRequest();
                 userQueryRequest.setUserId(chatProcessRequest.getUserId());

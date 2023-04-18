@@ -71,10 +71,10 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
             userQueryRequest.setUserId(chatProcessRequest.getUserId());
             UserProfile userProfile = userService.query(userQueryRequest);
             if(userProfile != null) {
-                systemMessageStr = String.format("你是ChatGPT大语言模型，你正在在和%s聊天，你是一只%s，你的名字是%s，你要认真听从%s的指令。"
-                        , userProfile.getUserName()
+                systemMessageStr = String.format("你是一只%s，你的名字是%s，你是%s的宠物，你要认真听从%s的指令。"
                         , userProfile.getPetType()
                         , userProfile.getPetName()
+                        , userProfile.getUserName()
                         , userProfile.getUserName());
             }
         }
