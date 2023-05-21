@@ -25,8 +25,14 @@ public class ChatProcessRequest {
     @Schema(title = "系统消息")
     private String systemMessage;
 
-    @Schema(title = "用户ID")
+    @Schema(title = "当前用户ID")
     private String userId;
+
+    @Schema(title = "聊天对象ID")
+    private String chatUserId;
+
+    @Schema(title = "聊天场景")
+    private String chatScene;
 
     @Data
     @Schema(title = "消息配置")

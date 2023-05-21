@@ -67,3 +67,27 @@ CREATE TABLE IF NOT EXISTS user_profile (
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
+
+CREATE TABLE IF NOT EXISTS `pet_user_profile` (
+   `id` int(10) unsigned NOT NULL COMMENT 'ID',
+   `role_type` tinyint(4) unsigned NOT NULL COMMENT '角色类型',
+   `user_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+   `profile` varchar(1024) NOT NULL COMMENT '档案',
+   `status` tinyint(4) NOT NULL COMMENT '状态',
+   `gmt_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+   PRIMARY KEY (`id`),
+   KEY `user_id` (`user_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='宠物档案表';
+
+CREATE TABLE IF NOT EXISTS `pet_chat_room` (
+    `id` BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+    `user_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+    `chat_user_id` int(10) unsigned NOT NULL COMMENT '聊天对象用户ID',
+    `chat_context` varchar(1024) NOT NULL COMMENT '上下文',
+    `status` tinyint(4) NOT NULL COMMENT '状态',
+    `gmt_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY `user_id` (`user_id`,`chat_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='宠物聊天室表';

@@ -11,6 +11,7 @@ import com.hncboy.chatgpt.front.domain.bo.UserProfile;
 import com.hncboy.chatgpt.front.domain.request.UserQueryRequest;
 import com.hncboy.chatgpt.front.service.ChatMessageService;
 import com.hncboy.chatgpt.front.service.ChatRoomService;
+import com.hncboy.chatgpt.front.service.PetChatService;
 import com.hncboy.chatgpt.front.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,9 @@ public abstract class AbstractDatabaseDataStorage implements DataStorage {
 
     @Resource
     protected UserService userService;
+
+    @Resource
+    private PetChatService petChatService;
 
     @Override
     public void onMessage(ChatMessageStorage chatMessageStorage) {
@@ -117,16 +121,23 @@ public abstract class AbstractDatabaseDataStorage implements DataStorage {
         // 更新消息
         chatMessageService.updateById(questionChatMessageDO);
         chatMessageService.updateById(answerChatMessageDO);
-        if(chatMessageStorage.getUserId() != null) {
+        if(chatMessageStorage.getUserId() != null && chatMessageStorage.getUserId() != null) {
             try {
-                UserQueryRequest userQueryRequest = new UserQueryRequest();
-                userQueryRequest.setUserId(chatMessageStorage.getUserId());
-                UserProfile userProfile = userService.query(userQueryRequest);
-                JSONObject jsonObject = JSONUtil.parseObj(userProfile.getChatInfo());
+//                UserQueryRequest userQueryRequest = new UserQueryRequest();
+//                userQueryRequest.setUserId(chatMessageStorage.getUserId());
+//                UserProfile userProfile = userService.query(userQueryRequest);
+//                JSONObject jsonObject = JSONUtil.parseObj(userProfile.getChatInfo());
+//                jsonObject.set("lastAnswerMessageId", answerChatMessageDO.getMessageId());
+//                jsonObject.set("lastAnswerConversationId", answerChatMessageDO.getConversationId());
+//                userProfile.setChatInfo(jsonObject.toString());
+//                userService.createOrUpdate(userProfile);
+
+                JSONObject jsonObject = new JSONObject();
                 jsonObject.set("lastAnswerMessageId", answerChatMessageDO.getMessageId());
                 jsonObject.set("lastAnswerConversationId", answerChatMessageDO.getConversationId());
-                userProfile.setChatInfo(jsonObject.toString());
-                userService.createOrUpdate(userProfile);
+                petChatService.saveChatInfo(Integer.valueOf(chatMessageStorage.getUserId())
+                        , Integer.valueOf(chatMessageStorage.getChatUserId())
+                        , jsonObject.toString());
             } catch (Exception e) {
                 log.error("", e);
             }

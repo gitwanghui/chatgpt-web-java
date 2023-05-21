@@ -18,6 +18,7 @@ import com.hncboy.chatgpt.front.domain.bo.UserProfile;
 import com.hncboy.chatgpt.front.domain.request.ChatProcessRequest;
 import com.hncboy.chatgpt.front.domain.request.UserQueryRequest;
 import com.hncboy.chatgpt.front.service.ChatMessageService;
+import com.hncboy.chatgpt.front.service.PetChatService;
 import com.hncboy.chatgpt.front.service.UserService;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.entity.chat.Message;
@@ -53,6 +54,9 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
     @Resource
     private UserService userService;
 
+    @Resource
+    private PetChatService petChatService;
+
     @Override
     public ResponseBodyEmitter requestToResponseEmitter(ChatProcessRequest chatProcessRequest, ResponseBodyEmitter emitter) {
         // 初始化聊天消息
@@ -66,17 +70,21 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
 
         // 系统角色消息
         String systemMessageStr = null;
-        if(StrUtil.isNotBlank(chatProcessRequest.getUserId())) {
-            UserQueryRequest userQueryRequest = new UserQueryRequest();
-            userQueryRequest.setUserId(chatProcessRequest.getUserId());
-            UserProfile userProfile = userService.query(userQueryRequest);
-            if(userProfile != null) {
-                systemMessageStr = String.format("你是一只%s，你的名字是%s，你是%s的宠物，你要认真听从%s的指令。"
-                        , userProfile.getPetType()
-                        , userProfile.getPetName()
-                        , userProfile.getUserName()
-                        , userProfile.getUserName());
-            }
+        if(StrUtil.isNotBlank(chatProcessRequest.getUserId())
+                && StrUtil.isNotBlank(chatProcessRequest.getChatUserId())) {
+//            UserQueryRequest userQueryRequest = new UserQueryRequest();
+//            userQueryRequest.setUserId(chatProcessRequest.getUserId());
+//            UserProfile userProfile = userService.query(userQueryRequest);
+//            if(userProfile != null) {
+//                systemMessageStr = String.format("你是一只%s，你的名字是%s，你是%s的宠物，你要认真听从%s的指令。"
+//                        , userProfile.getPetType()
+//                        , userProfile.getPetName()
+//                        , userProfile.getUserName()
+//                        , userProfile.getUserName());
+//            }
+
+            systemMessageStr = petChatService.querySystemMessage(Integer.valueOf(chatProcessRequest.getUserId())
+                    , Integer.valueOf(chatProcessRequest.getChatUserId()));
         }
         if (systemMessageStr == null && StrUtil.isNotBlank(chatProcessRequest.getSystemMessage())) {
             systemMessageStr = chatProcessRequest.getSystemMessage();
@@ -112,6 +120,7 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                 .setOriginalRequestData(ObjectMapperUtil.toJson(chatCompletion))
                 .setChatMessageDO(chatMessageDO)
                 .setUserId(chatProcessRequest.getUserId())
+                .setChatUserId(chatProcessRequest.getChatUserId())
                 .build();
 
         ApiKeyChatClientBuilder.buildOpenAiStreamClient().streamChatCompletion(chatCompletion, parsedEventSourceListener);

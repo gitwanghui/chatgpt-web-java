@@ -50,4 +50,6 @@ public class ChatMessageStorage {
     private int currentStreamMessageCount;
 
     private String userId;
+
+    private String chatUserId;
 }
