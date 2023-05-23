@@ -24,4 +24,6 @@ public class PetUserProfileVO {
     private String birthday;
 
     private String keywords;
+
+    private Integer age;
 }

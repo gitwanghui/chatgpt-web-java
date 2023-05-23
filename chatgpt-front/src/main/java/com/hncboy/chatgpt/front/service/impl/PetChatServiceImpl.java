@@ -65,7 +65,7 @@ public class PetChatServiceImpl extends ServiceImpl<PetChatRoomMapper, PetChatRo
         if (chatUserProfileVO.getRoleType().intValue() != 2) {
             return null;
         }
-        String systemMessage = String.format("you are a %s, called %s, a pet raised by a chinese called 「%s」. Follow the user's instructions carefully. Respond using markdown."
+        String systemMessage = String.format("you are a %s, called 「%s」, a pet raised by a chinese called 「%s」. Follow the user's instructions carefully. Respond using markdown."
                 , chatUserProfileVO.getPetType() == 1 ? "cat" : "dog"
                 , chatUserProfileVO.getNickName()
                 , userProfileVO.getNickName());

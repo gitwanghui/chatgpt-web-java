@@ -36,6 +36,10 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ResponseBodyEmitter chatProcess(ChatProcessRequest chatProcessRequest) {
+        if(StringUtils.isBlank(chatProcessRequest.getUserId()) || StringUtils.isBlank(chatProcessRequest.getChatUserId())) {
+            return new ResponseBodyEmitter(1L);
+        }
+
         // 超时时间设置 3 分钟
         ResponseBodyEmitter emitter = new ResponseBodyEmitter(3 * 60 * 1000L);
         emitter.onCompletion(() -> log.debug("请求参数：{}，Front-end closed the emitter connection.", ObjectMapperUtil.toJson(chatProcessRequest)));
