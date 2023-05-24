@@ -88,6 +88,5 @@ CREATE TABLE IF NOT EXISTS `pet_chat_room` (
     `status` tinyint(4) NOT NULL COMMENT '状态',
     `gmt_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-    PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`,`chat_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='宠物聊天室表';
