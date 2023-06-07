@@ -62,13 +62,19 @@ public class PetChatServiceImpl extends ServiceImpl<PetChatRoomMapper, PetChatRo
         if(userProfileVO == null || chatUserProfileVO == null) {
             return null;
         }
-        if (chatUserProfileVO.getRoleType().intValue() != 2) {
-            return null;
+        if (chatUserProfileVO.getRoleType().intValue() == 2) {
+            String systemMessage = String.format("you are a %s, called 「%s」, a pet raised by a chinese called 「%s」. Follow the user's instructions carefully. Respond using markdown."
+                    , chatUserProfileVO.getPetType() == 1 ? "cat" : "dog"
+                    , chatUserProfileVO.getNickName()
+                    , userProfileVO.getNickName());
+            return systemMessage;
+        } else if(chatUserProfileVO.getRoleType().intValue() == 3) {
+            String systemMessage = String.format("You are a pet behaviorist hired by a chinese called 「%s」. your name is 「%s」. your job is to teach the user how to raise a pet. Follow the user's instructions carefully. Respond using markdown."
+                    , userProfileVO.getNickName()
+                    , chatUserProfileVO.getNickName()
+                    );
+            return systemMessage;
         }
-        String systemMessage = String.format("you are a %s, called 「%s」, a pet raised by a chinese called 「%s」. Follow the user's instructions carefully. Respond using markdown."
-                , chatUserProfileVO.getPetType() == 1 ? "cat" : "dog"
-                , chatUserProfileVO.getNickName()
-                , userProfileVO.getNickName());
-        return systemMessage;
+        return null;
     }
 }
