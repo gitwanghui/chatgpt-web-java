@@ -9,8 +9,12 @@ import com.hncboy.chatgpt.front.service.PetChatService;
 import com.hncboy.chatgpt.front.service.PetUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 @Slf4j
@@ -63,18 +67,84 @@ public class PetChatServiceImpl extends ServiceImpl<PetChatRoomMapper, PetChatRo
             return null;
         }
         if (chatUserProfileVO.getRoleType().intValue() == 2) {
-            String systemMessage = String.format("you are a %s, called 「%s」, a pet raised by a chinese called 「%s」. Follow the user's instructions carefully. Respond using markdown."
+            StringBuilder sb = new StringBuilder();
+            String s1 = String.format("you are a %s, named 「%s」, a pet raised by the user named 「%s」."
                     , chatUserProfileVO.getPetType() == 1 ? "cat" : "dog"
                     , chatUserProfileVO.getNickName()
                     , userProfileVO.getNickName());
-            return systemMessage;
+            sb.append(s1);
+            String s2 = String.format(" 「%s」 is %s"
+                    , chatUserProfileVO.getNickName()
+                    , calcPetAge(chatUserProfileVO.getBirthday())
+            );
+            sb.append(s2);
+            if (StringUtils.isNotBlank(chatUserProfileVO.getKeywords())) {
+                String s3 = String.format(", and the user describe it using words 「%s」. "
+                        , chatUserProfileVO.getKeywords()
+                );
+                sb.append(s3);
+            } else {
+                // s2的句号
+                sb.append(".");
+            }
+            sb.append("Follow the user's instructions carefully. Respond using markdown. Prefer to reply to the user in Chinese.");
+            return sb.toString();
         } else if(chatUserProfileVO.getRoleType().intValue() == 3) {
-            String systemMessage = String.format("You are a pet behaviorist hired by a chinese called 「%s」. your name is 「%s」. your job is to teach the user how to raise a pet. Follow the user's instructions carefully. Respond using markdown."
+            String systemMessage = String.format("You are a pet behaviorist hired by the user named 「%s」. Your name is 「%s」, your job is to teach the user how to raise a pet. Follow the user's instructions carefully. Respond using markdown. Prefer to reply to the user in Chinese."
                     , userProfileVO.getNickName()
                     , chatUserProfileVO.getNickName()
                     );
             return systemMessage;
         }
         return null;
+    }
+
+    /**
+     * 计算年龄
+     * @param birthday
+     * @return
+     */
+    private String calcPetAge(String birthday) {
+        try {
+            if (StringUtils.isNotBlank(birthday) && birthday.length() >= 4) {
+                Calendar cal = Calendar.getInstance();
+                Calendar bir = Calendar.getInstance();
+                Date birthDate = strToDate(birthday, "yyyy-MM");
+                bir.setTime(birthDate);
+                int yearNow = cal.get(Calendar.YEAR);
+                int monthNow = cal.get(Calendar.MONTH);
+                int dayNow = cal.get(Calendar.DAY_OF_MONTH);
+                // 取出出生年月日
+                int yearBirth = bir.get(Calendar.YEAR);
+                int monthBirth = bir.get(Calendar.MONTH);
+                int dayBirth = bir.get(Calendar.DAY_OF_MONTH);
+                // 大概年龄是当前年减去出生年
+                int age = yearNow - yearBirth;
+                // 如果出当前月小与出生月，或者当前月等于出生月但是当前日小于出生日，那么年龄age就减一岁
+                if (monthNow < monthBirth || (monthNow == monthBirth && dayNow < dayBirth)) {
+                    age--;
+                }
+                age = age <= 0 ? 0 : age;
+                if (age == 0) {
+                    return "0 years old";
+                } else if(age == 1) {
+                    return "1 year old";
+                } else {
+                    return age + " years old";
+                }
+            }
+        } catch (Exception e) {
+            log.error("birthday=" + birthday, e);
+        }
+        return "0 years old";
+    }
+
+    public static Date strToDate(String dateStr, String DATE_FORMAT) {
+        SimpleDateFormat myFormat = new SimpleDateFormat(DATE_FORMAT);
+        try {
+            return myFormat.parse(dateStr);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }
