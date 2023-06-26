@@ -23,12 +23,13 @@ import com.hncboy.chatgpt.front.service.UserService;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.entity.chat.Message;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import jakarta.annotation.Resource;
-import java.util.LinkedList;
-import java.util.Objects;
+
+import java.util.*;
 
 /**
  * @author hncboy
@@ -56,6 +57,8 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
 
     @Resource
     private PetChatService petChatService;
+
+    private List<String> keywordBlackList = Arrays.asList("openai","chatgpt","gpt","gpt-2","gpt-3","transformer","ai language model","人工智能","机器学习","深度学习","自然语言处理","对话系统","聊天机器人","文本生成","语音交互","语义理解","智能客服","聊天助手","智能语音助手","智能问答","智能聊天","智能语音识别");
 
     @Override
     public ResponseBodyEmitter requestToResponseEmitter(ChatProcessRequest chatProcessRequest, ResponseBodyEmitter emitter) {
@@ -102,7 +105,7 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                 .maxTokens(1000)
                 .model(chatConfig.getOpenaiApiModel())
                 // [0, 2] 越低越精准
-                .temperature(0.8)
+                .temperature(1)
                 .topP(1.0)
                 // 每次生成一条
                 .n(1)
@@ -165,6 +168,22 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                     .eq(ChatMessageDO::getMessageId, chatMessageDO.getParentAnswerMessageId()));
             addContextChatMessage(parentMessage, messages);
             return;
+        }
+
+        if (chatMessageDO.getMessageType() == ChatMessageTypeEnum.ANSWER) {
+            int totalLength = messages.stream().mapToInt(a -> StringUtils.length(a.getContent())).sum();
+            int length = chatMessageDO.getContent().length();
+            if (totalLength + length > 2048) {
+                log.warn("terminate addContextChatMessage, totalLength={}, length={}, threshold", totalLength, length, 2048);
+                return;
+            }
+            Optional<String> black = keywordBlackList.stream()
+                    .filter(t -> chatMessageDO.getContent().toLowerCase().contains(t))
+                    .findFirst();
+            if (black.isPresent()) {
+                log.warn("terminate addContextChatMessage, match keyword={}", black.get());
+                return;
+            }
         }
 
         // 从下往上找并添加，越上面的数据放越前面
