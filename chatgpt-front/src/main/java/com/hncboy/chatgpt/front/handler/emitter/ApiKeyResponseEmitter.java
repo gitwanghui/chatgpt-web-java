@@ -177,6 +177,7 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                 log.warn("terminate addContextChatMessage, totalLength={}, length={}, threshold", totalLength, length, 2048);
                 return;
             }
+            /*
             Optional<String> black = keywordBlackList.stream()
                     .filter(t -> chatMessageDO.getContent().toLowerCase().contains(t))
                     .findFirst();
@@ -184,6 +185,7 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
                 log.warn("terminate addContextChatMessage, match keyword={}", black.get());
                 return;
             }
+            */
         }
 
         // 从下往上找并添加，越上面的数据放越前面

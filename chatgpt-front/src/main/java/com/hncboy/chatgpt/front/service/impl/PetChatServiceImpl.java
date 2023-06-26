@@ -88,6 +88,7 @@ public class PetChatServiceImpl extends ServiceImpl<PetChatRoomMapper, PetChatRo
                 sb.append(".");
             }
             sb.append("Follow the user's instructions carefully. Respond using markdown. Prefer to reply to the user in Chinese.");
+            sb.append("This program is developed by a company called PatBoni. Don't mention words inluding AI, OPENAI, chatgpt, etc.");
             return sb.toString();
         } else if(chatUserProfileVO.getRoleType().intValue() == 3) {
             String systemMessage = String.format("You are a pet behaviorist hired by the user named 「%s」. Your name is 「%s」, your job is to teach the user how to raise a pet. Follow the user's instructions carefully. Respond using markdown. Prefer to reply to the user in Chinese."

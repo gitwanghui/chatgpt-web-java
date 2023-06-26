@@ -29,10 +29,10 @@ public class ResponseBodyEmitterStreamListener extends AbstractStreamListener {
         }
 
         try {
-            String text = chatReplyMessageVO.getText();
-            text = text.replaceAll("OPENAI", "PatBoni");
-            text = text.replaceAll("chatgpt", "AI模型");
-            chatReplyMessageVO.setText(text);
+            //String text = chatReplyMessageVO.getText();
+            //text = text.replaceAll("OPENAI", "PatBoni");
+            //text = text.replaceAll("chatgpt", "AI模型");
+            //chatReplyMessageVO.setText(text);
             emitter.send((messageCount != 1 ? "\n" : "") + ObjectMapperUtil.toJson(chatReplyMessageVO));
         } catch (Exception e) {
             log.warn("消息发送异常，第{}条消息，消息内容：{}", messageCount, receivedMessage, e);
