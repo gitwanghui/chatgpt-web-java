@@ -71,6 +71,15 @@ public class ApiKeyResponseEmitter implements ResponseEmitter {
         // 添加用户上下文消息
         addContextChatMessage(chatMessageDO, messages);
 
+        int totalLength = messages.stream().mapToInt(a -> StringUtils.length(a.getContent())).sum();
+        if (totalLength > 2048 && messages.size() >=2 ) {
+            // 删除最后一组问题和答案
+            messages.removeFirst();
+            messages.removeFirst();
+            int totalLength2 = messages.stream().mapToInt(a -> StringUtils.length(a.getContent())).sum();
+            log.info("removeFirst X2, totalLength={}, totalLength2={}", totalLength, totalLength2);
+        }
+
         // 系统角色消息
         String systemMessageStr = null;
         if(StrUtil.isNotBlank(chatProcessRequest.getUserId())
